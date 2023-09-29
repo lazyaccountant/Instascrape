@@ -22,16 +22,22 @@ def user_stat(user: User):
 		media  = Post(post)
 
 		data["post_count"] = i
-		data["likes"].append(media.likes)
+		if media.likes > 1:
+			data["likes"].append(media.likes)
+			rates.append(round((media.likes + media.comments)/followers, 2))
 		data["comments"].append(media.comments)
-		rates.append(round((media.likes + media.comments)/followers, 2))
 		if media.media_type == 2:
 			data["views"].append(media.views)
 
+
+	stat["id"] = user.id
+	stat["username"] = user.username
+	stat["category"] = user.cat
+	stat["followers"] = followers
 	stat["avg_likes"] = average(data["likes"])
 	stat["avg_comments"] = average(data["comments"])
 	stat["avg_views"] = average(data["views"])
-	stat["engagement_rate"] = average(rates, True)
+	stat["engagement_rate(%)"] = average(rates, True)
 	stat["post_count"] =  post_count
 
 

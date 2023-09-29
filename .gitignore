@@ -1,0 +1,4 @@
+myenv
+config.env
+session.json
+__pycache__
