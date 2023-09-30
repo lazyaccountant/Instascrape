@@ -21,7 +21,6 @@ def user_stat(user: User):
 	for i, post in enumerate(posts, start=1):
 		media  = Post(post)
 
-		data["post_count"] = i
 		if media.likes > 1:
 			data["likes"].append(media.likes)
 			rates.append(round((media.likes + media.comments)/followers, 2))
@@ -30,9 +29,10 @@ def user_stat(user: User):
 			data["views"].append(media.views)
 
 
-	stat["id"] = user.id
 	stat["username"] = user.username
-	stat["category"] = user.cat
+	stat["category"] = user.get_user_category()
+	stat["bio"] = user.bio
+	#stat["bio_links"] = user.bio_links
 	stat["followers"] = followers
 	stat["avg_likes"] = average(data["likes"])
 	stat["avg_comments"] = average(data["comments"])
@@ -47,9 +47,14 @@ def user_stat(user: User):
 def average(x: list, percent=False) -> int:
 	length = len(x)
 	total = sum(x)
-	if percent:
-		avg = round((total / length)*100, 2)
-	else:
-		avg = round(total / length)
+
+	try:
+		if percent:
+			avg = round((total / length)*100, 2)
+		else:
+			avg = round(total / length)
+
+	except ZeroDivisionError:
+		avg = 0
 
 	return avg
