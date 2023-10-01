@@ -1,8 +1,33 @@
+import os
+from instagrapi import Client
+from ensta import Guest
+from instagrapi.exceptions import ChallengeRequired
+from dotenv import load_dotenv
+
+load_dotenv()
+username = os.getenv("USERNAME")
+password = os.getenv("PASSWORD")
+
+
+guest = Guest()
+cl = Client()
+
+cl.delay_range = [1, 3]
+cl.load_settings("session.json")
+cl.login(username, password)
+
+try:
+        cl.get_timeline_feed() # check session
+except ChallengeRequired:
+        print(ChallengeRequired.message)
+
+
 class User:
 	def __init__(self, username):
 		self.username = username
 		self.profile = guest.profile(self.username)
 		self.id = self.profile.user_id
+		self.cat = self.profile.category_name
 		self.followers = self.profile.follower_count
 		self.bio = self.profile.biography
 		#self.bio_links = self.profile.biography_links
@@ -43,11 +68,11 @@ class User:
 
 		return followers_list
 
-	def get_user_category(self):
+	"""def get_user_category(self):
 		self.info = cl.user_info(self.id)
 		category = self.info.category_name
 
-		return category
+		return category"""
 
 
 
@@ -59,3 +84,4 @@ class Post:
 		self.media_type = post.media_type
 		if self.media_type == 2:
 			self.views = post.view_count
+

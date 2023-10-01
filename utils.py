@@ -1,3 +1,4 @@
+import re
 from models import *
 
 def engagement_rate(user: User, post: Post):
@@ -30,8 +31,8 @@ def user_stat(user: User):
 
 
 	stat["username"] = user.username
-	stat["category"] = user.get_user_category()
-	stat["bio"] = user.bio
+	stat["category"] = user.cat
+	stat["email"] = extract_email(user.bio)
 	#stat["bio_links"] = user.bio_links
 	stat["followers"] = followers
 	stat["avg_likes"] = average(data["likes"])
@@ -58,3 +59,16 @@ def average(x: list, percent=False) -> int:
 		avg = 0
 
 	return avg
+
+
+def extract_email(bio: str):
+	pattern = r"[a-zA-Z0-9_.+-]+@[a-zA-Z]+.com"
+
+	match = re.findall(pattern, bio)
+
+	try:
+		email = match[0]
+	except IndexError:
+		email = ''
+
+	return email

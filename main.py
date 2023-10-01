@@ -1,30 +1,8 @@
-import os
-import time
-from models import User, Post
+from models import *
 from utils import *
 import csv
-from instagrapi import Client
-from ensta import Guest
-from instagrapi.exceptions import ChallengeRequired
 from ensta.lib.Exceptions import APIError
-from dotenv import load_dotenv
 
-load_dotenv()
-username = os.getenv("USERNAME")
-password = os.getenv("PASSWORD")
-
-
-guest = Guest()
-cl = Client()
-
-cl.delay_range = [1, 3]
-cl.load_settings("session.json")
-cl.login(username, password)
-
-try:
-        cl.get_timeline_feed() # check session
-except ChallengeRequired:
-        print(ChallengeRequired.message)
 
 
 def stalk():
@@ -32,10 +10,10 @@ def stalk():
 	user = User(prompt)
 	followings = user.get_user_following()
 
-	with open("data.csv", "w", newline="") as f:
-		fieldnames = ["username", "category", "bio_links", "followers", "avg_likes", "avg_comments", "avg_views", "engagement_rate(%)", "post_count"]
+	with open("data.csv", "a") as f:
+		fieldnames = ["username", "category", "email", "followers", "avg_likes", "avg_comments", "avg_views", "engagement_rate(%)", "post_count"]
 		writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
-		writer.writeheader()
+		#writer.writeheader()
 
 		for username in followings:
 			try:
@@ -46,6 +24,26 @@ def stalk():
 					print(data)
 			except APIError:
 				pass
+
+def save_stat(usernames: list):
+
+	with open("stat.csv", "w", newline="") as f:
+		fieldnames = ["username", "category", "email", "followers", "avg_likes", "avg_comments", "avg_views", "engagement_rate(%)", "post_count"]
+		writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+		writer.writeheader()
+
+		for username in usernames:
+			try:
+				user = User(username)
+				if 10000 < user.followers < 100000 and user.professional:
+					data = user_stat(user)
+					writer.writerow(data)
+					print(data)
+			except APIError:
+				pass
+
+
+
 
 # edit instagrapi/mixins/fbsearch.py count to 50
 def search():
@@ -59,5 +57,6 @@ def search():
 	return results
 
 
-users = search()
-print(users)
+#users = search()
+#save_stat(users)
+stalk()
